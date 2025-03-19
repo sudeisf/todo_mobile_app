@@ -1,6 +1,7 @@
 
 
 import "package:flutter/material.dart";
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 void main () => runApp(MyApp());
@@ -27,7 +28,8 @@ class TodoScreen extends StatefulWidget {
 
 
   class _TodoScreenState extends State<TodoScreen> {
-      List<String> _tasks = ['i have to do home work' , "do littl bit codeing" , "do excercise and jump"] ;
+
+      List<String> _tasks = [] ;
       List<bool> _isSelectedList = [false ,false, false];
       bool _isSelectionModeActive = false ;
 
@@ -77,7 +79,7 @@ class TodoScreen extends StatefulWidget {
                 onPressed: (){
                   if(_taskController.text.isNotEmpty) {
                      setState(() {
-                      _tasks.add(_taskController.text);
+                      _addTask(_taskController.text);
                       _isSelectedList.add(false);
             });
             Navigator.of(context).pop();
@@ -94,9 +96,40 @@ class TodoScreen extends StatefulWidget {
         );
       }
 
+      void _loadTasks() async {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        setState(() {
+          _tasks = prefs.getStringList('tasks') ?? [];
+        });
+      }
+
+      void _saveTasks () async {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setStringList("tasks", _tasks);
+      }
+
+      void _addTask(String task) {
+        setState(() {
+          _tasks.add(task);
+        });
+        _saveTasks();
+      }
+
+      void _removeTask(int index) {
+        setState(() {
+          _tasks.removeAt(index);
+        });
+        _saveTasks();
+      }
+      @override
+      void initState() {
+        super.initState();
+        _loadTasks(); // Load saved tasks when the app starts
+      }
+
 
       @override
-  Widget build(BuildContext context) {
+      Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
@@ -130,7 +163,7 @@ class TodoScreen extends StatefulWidget {
           icon: Icon(Icons.delete , color: Colors.white54),
           onPressed: () {
           setState(() {
-          _tasks.removeAt(index);
+          _removeTask(index);
           });
           },
           ),
