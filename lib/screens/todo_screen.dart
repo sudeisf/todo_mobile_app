@@ -4,6 +4,9 @@ import '../models/tasks.dart';
 import '../services/task_service.dart';
 import '../widgets/task_tile.dart';
 import '../widgets/custom_bottom_sheet.dart'; // Import the new bottom sheet
+import '../widgets/sidebar.dart' ;
+import '../widgets/mapScreen.dart';
+
 
 class TodoScreen extends StatefulWidget {
   @override
@@ -94,6 +97,15 @@ class _TodoScreenState extends State<TodoScreen> {
       appBar: AppBar(
         title: const Text("To-Do List"),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.map),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EnhancedRoutePlanner()),
+              );
+            },
+          ),
           if (_isSelectionModeActive)
             IconButton(
               icon: const Icon(Icons.done),
@@ -101,6 +113,10 @@ class _TodoScreenState extends State<TodoScreen> {
             ),
         ],
       ),
+      drawer: Drawer(
+        child: Sidebar(),
+      )
+      ,
       body: ListView.builder(
         itemCount: _tasks.length,
         padding: const EdgeInsets.all(10),
